@@ -10,6 +10,8 @@ on:
 jobs:
   find-directories:
     runs-on: ubuntu-latest
+    outputs:
+      directories: ${{ steps.set-dirs.outputs.directories }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -17,7 +19,7 @@ jobs:
           fetch-depth: 0
 
       - name: Find modified directories
-        id: find-directories
+        id: set-dirs
         run: |
           # 检查是否存在父提交
           if git rev-parse HEAD^ >/dev/null 2>&1; then
