@@ -24,10 +24,10 @@ jobs:
         run: |
           echo "Comparing commits: ${{ github.event.before }} and ${{ github.sha }}"
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "${{ matrix.project }}/publish.yaml"; then
-            echo "changed_projects=${{ matrix.project }}" >> $GITHUB_ENV  # 仅设置当前项目
+            echo "changed_projects=${{ matrix.project }}" >> $GITHUB_OUTPUT  # 仅设置当前项目
             echo "Projects changed: ${{ matrix.project }}"
           else
-            echo "changed_projects=none" >> $GITHUB_ENV
+            echo "changed_projects=none" >> $GITHUB_OUTPUT
             echo "Projects changed: none"
           fi
 
@@ -38,12 +38,12 @@ jobs:
       - name: Check if there are any changed projects
         id: output_changed_projects
         run: |
-          echo "Changed projects: ${{ env.changed_projects }}"
-          if [[ "${{ env.changed_projects }}" == "none" || -z "${{ env.changed_projects }}" ]]; then
+          echo "Changed projects: ${{ steps.check_projects.outputs.changed_projects }}"
+          if [[ "${{ steps.check_projects.outputs.changed_projects }}" == "none" || -z "${{ steps.check_projects.outputs.changed_projects }}" ]]; then
             echo "No changes to build."
             exit 0  # Exit if no changes
           fi
 
       - name: Call Build Workflow
         run: |
-          echo "Calling build workflow for ${{ env.changed_projects }}"
+          echo "Calling build workflow for ${{ steps.check_projects.outputs.changed_projects }}"
