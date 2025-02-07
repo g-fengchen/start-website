@@ -46,7 +46,11 @@ jobs:
           DIRECTORIES_STR=$(IFS=,; echo "${DIRECTORIES[*]}")
           echo "Found directories: $DIRECTORIES_STR"
 
-          json_array=$(echo "$INPUT" | jq -R 'split(",")' | jq -c)
+          if [[ -z "$DIRECTORIES_STR" ]]; then
+            json_array="[]"
+          else
+            json_array=$(echo "$INPUT" | jq -R --arg delimiter "," 'split($delimiter)')
+          fi
           echo "Found  array directories: $json_array"
 
           # 导出找到的目录，以便在后续的任务中使用
