@@ -1,4 +1,4 @@
-async function preInit(inputObj1) {
+async function preInit(inputObj12) {
 
 }
 
