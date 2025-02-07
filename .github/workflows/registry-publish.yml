@@ -27,10 +27,10 @@ jobs:
               changed_files=$(git diff --name-only HEAD^ HEAD) # 获取与前一提交的变化
             fi
             
-            # 提取目录并去重
+            # 提取唯一目录并用逗号分隔
             changed_dirs=$(echo "$changed_files" | awk -F/ '{print $1}' | sort -u | tr '\n' ',' | sed 's/,$//') # 使用逗号分隔
             
-            # 输出提取的目录到一个环境变量，终止时不允许有额外的逗号
+            # 输出提取的目录到一个环境变量
             echo "CHANGED_DIRS=${changed_dirs}" >> $GITHUB_ENV
           else
             echo "Not inside a Git repository"

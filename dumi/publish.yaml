@@ -3,7 +3,7 @@ Type: Project
 Name: website-dumi-v3
 Version: 0.0.5
 Provider:
-  - 阿里云 # 取值内容参考：https://api.devsapp.cn/v3/common/args.html
+  - 阿里云 # 取值内容参考：https://api.devsapp.cn/v3/common/args.html33
 Description: Serverless Devs 应用开发模板
 HomePage: https://www.serverless-devs.com
 Tags: #标签详情
@@ -53,4 +53,3 @@ Parameters:
       type: string
       default: dumi-${default-suffix}
       description: 应用的函数名称
-
