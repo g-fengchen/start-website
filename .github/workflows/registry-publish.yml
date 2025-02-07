@@ -39,6 +39,8 @@ jobs:
   collect_all_changes:
     needs: check_changes
     runs-on: ubuntu-latest
+    outputs:
+      changed_projects: ${{ steps.collect_all_changes.outputs.changed_projects }}
     steps:
       - name: Collect changes
         id: collect_all_changes
@@ -54,6 +56,7 @@ jobs:
           if [[ -z "$changed_projects_list" ]]; then
             changed_projects_list="none"
           fi
+          echo "Changed projects: '${changed_projects_list}'"
           echo "changed_projects=${changed_projects_list}" >> $GITHUB_OUTPUT
 
   build:
