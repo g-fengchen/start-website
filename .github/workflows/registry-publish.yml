@@ -43,8 +43,9 @@ jobs:
       - name: Collect changes
         id: collect_all_changes
         run: |
+          echo "Changed all_changed_projects: ${{ needs.check_changes.outputs.all_changed_projects }}"
           changed_projects_list=""
-          for result in ${{ join(needs.check_changes.*.outputs.changed_projects, ' ') }}; do
+          for result in ${{ join(needs.check_changes.outputs.all_changed_projects, ' ') }}; do
             if [[ "$result" != "none" ]]; then
               changed_projects_list="${changed_projects_list} $result"
             fi
