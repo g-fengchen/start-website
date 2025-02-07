@@ -17,8 +17,8 @@ jobs:
       - name: Find projects
         id: set_outputs
         run: |
-          projects=$(find . -maxdepth 1 -mindepth 1 -type d | sed 's|./||' | jq -R . | jq -s .) # 获取子目录并转换为JSON数组
-          echo "::set-output name=projects::$projects" # 设置输出
+          projects=$(find . -maxdepth 1 -mindepth 1 -type d | sed 's|./||') # 获取子目录
+          echo "::set-output name=projects::${projects}" # 设置输出
   build:
     runs-on: ubuntu-latest
     needs: scan
