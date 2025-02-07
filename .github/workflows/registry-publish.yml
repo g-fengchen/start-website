@@ -20,7 +20,8 @@ jobs:
       - name: Determine if publish.yaml has changed
         id: check_projects
         run: |
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "${{ matrix.project }}/publish.yaml"; then
+          echo "Comparing commits: ${{ github.event.before }} and ${{ github.sha }}"
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "${{ matrix.project }}/description.yaml"; then
             echo "changed_projects=${{ matrix.project }}" >> $GITHUB_ENV  # 仅设置当前项目
             echo "Projects changed: ${{ matrix.project }}"
           else
