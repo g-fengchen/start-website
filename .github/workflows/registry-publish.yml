@@ -43,14 +43,14 @@ jobs:
           # 导出找到的目录，以便在后续的任务中使用
           echo "directories=$DIRECTORIES_STR" >> $GITHUB_OUTPUT
 
-  print-directories:
-    runs-on: ubuntu-latest
-    needs: find-directories
-    strategy:
-      matrix:
-        dir: ${{ fromJson(needs.find-directories.outputs.directories) }}
-    steps:
-      - name: Trigger build for each directory
-        uses: ./.github/workflows/build-project.yml
-        with:
-          project: ${{ matrix.dir }}
+  # print-directories:
+  #   runs-on: ubuntu-latest
+  #   needs: find-directories
+  #   strategy:
+  #     matrix:
+  #       dir: ${{ fromJson(needs.find-directories.outputs.directories) }}
+  #   steps:
+  #     - name: Trigger build for each directory
+  #       uses: ./.github/workflows/build-project.yml
+  #       with:
+  #         project: ${{ matrix.dir }}
