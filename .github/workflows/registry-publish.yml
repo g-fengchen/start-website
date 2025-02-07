@@ -41,8 +41,11 @@ jobs:
           done
 
           # 将数组转换为字符串，用逗号分隔
-          # DIRECTORIES_STR=$(IFS=,; echo "${DIRECTORIES[*]}")
-          echo "Found directories: $DIRECTORIES"
+          DIRECTORIES_STR=$(IFS=,; echo "${DIRECTORIES[*]}")
+          echo "Found directories: $DIRECTORIES_STR"
+
+          json_array=$(echo "$DIRECTORIES_STR" | jq -R 'split(",")')
+          echo "Found  array directories: $json_array"
 
           # 导出找到的目录，以便在后续的任务中使用
-          echo "directories=$DIRECTORIES" >> $GITHUB_OUTPUT
+          echo "directories=$json_array" >> $GITHUB_OUTPUT
