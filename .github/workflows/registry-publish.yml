@@ -58,12 +58,22 @@ jobs:
 
           # 导出找到的目录，以便在后续的任务中使用
           echo "directories=$json_array" >> $GITHUB_OUTPUT
-  trigger-builds:
+  setup-matrix:
     runs-on: ubuntu-latest
     needs: find-directories
-    uses: g-fengchen/start-website/.github/workflows/aaaaa.yml@v3
-    with:
-      project: ${{ matrix.dir }}
+    outputs:
+      dir: ${{ steps.set-dir.outputs.dir }}
     strategy:
       matrix:
         dir: ${{ fromJson(needs.find-directories.outputs.directories) }}
+    steps:
+      - name: Setup and Call reusable workflow
+        id: "set-dir"
+        run: |
+          echo "::set-output name=dir::${{ matrix.dir }}"
+  trigger-builds:
+    runs-on: ubuntu-latest
+    needs: setup-matrix
+    uses: g-fengchen/start-website/.github/workflows/aaaaa.yml@v3
+    with:
+      project: ${{ needs.setup-matrix.outputs.dir }}
