@@ -35,10 +35,15 @@ jobs:
     needs: check_changes
     runs-on: ubuntu-latest
     steps:
-      - name: console env
+      - name: Check if there are any changed projects
+        id: output_changed_projects
         run: |
-          echo "ENV ${{ env.changed_projects }}"
+          echo "Changed projects: ${{ env.changed_projects }}"
+          if [[ "${{ env.changed_projects }}" == "none" || -z "${{ env.changed_projects }}" ]]; then
+            echo "No changes to build."
+            exit 0  # Exit if no changes
+          fi
+
       - name: Call Build Workflow
-        if: env.changed_projects != 'none' && env.changed_projects != ''
         run: |
           echo "Calling build workflow for ${{ env.changed_projects }}"
