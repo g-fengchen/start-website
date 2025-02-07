@@ -48,7 +48,7 @@ jobs:
     needs: find-directories
     strategy:
       matrix:
-        dir: [${{ needs.find-directories.outputs.directories }}]
+        dir: ${{ fromJson(needs.find-directories.outputs.directories) }}
     steps:
       - name: Trigger build for each directory
         uses: ./.github/workflows/build-project.yml
