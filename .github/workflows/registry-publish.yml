@@ -1,41 +1,37 @@
-name: Extract Changed Directories
+name: CI
 
 on:
   push:
     branches:
-      - v3 # 根据需要修改为其他分支
+      - v3
 
 jobs:
-  extract_dirs:
+  check_changes:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project:
+          - docusaurus
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
 
-      - name: Get changed files
-        id: get_changed_files
+      - name: Determine if publish.yaml has changed
+        id: check_projects
         run: |
-          # 获取变更的文件
-          if [ "$(git rev-parse --is-inside-work-tree)" ]; then
-            # 只在有多个提交时使用 HEAD^
-            commit_count=$(git rev-list --count HEAD)
-            if [ "$commit_count" -eq 1 ]; then
-              changed_files=$(git diff --name-only HEAD) # 首次提交，获取所有文件
-            else
-              changed_files=$(git diff --name-only HEAD^ HEAD) # 获取与前一提交的变化
-            fi
-            
-            # 提取唯一目录并用逗号分隔
-            changed_dirs=$(echo "$changed_files" | awk -F/ '{print $1}' | sort -u | tr '\n' ',' | sed 's/,$//') # 使用逗号分隔
-            
-            # 输出提取的目录到一个环境变量
-            echo "CHANGED_DIRS=${changed_dirs}" >> $GITHUB_ENV
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "${{ matrix.project }}/publish.yaml"; then
+            echo "changed_projects=${{ matrix.project }}" >> $GITHUB_ENV  # 仅设置当前项目
+            echo "Projects changed: ${{ matrix.project }}"
           else
-            echo "Not inside a Git repository"
+            echo "changed_projects=none" >> $GITHUB_ENV
           fi
 
-      - name: Use changed directories
+  build:
+    needs: check_changes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Build Workflow
+        if: env.changed_projects != 'none'
         run: |
-          echo "Changed directories are: $CHANGED_DIRS"
+          echo "Calling build workflow for ${{ env.changed_projects }}"
