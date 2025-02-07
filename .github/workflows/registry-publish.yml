@@ -28,6 +28,7 @@ jobs:
             echo "Projects changed: ${{ matrix.project }}"
           else
             echo "changed_projects=none" >> $GITHUB_ENV
+            echo "Projects changed: none"
           fi
 
   build:
