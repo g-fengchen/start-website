@@ -9,7 +9,7 @@ jobs:
   check_changes:
     runs-on: ubuntu-latest
     outputs:
-      all_changed_projects: ${{ steps.collect_all_changes.outputs.changed_projects }}
+      all_changed_projects: ${{ steps.expose_changes.outputs.changed_projects }}
     strategy:
       matrix:
         project:
@@ -17,11 +17,10 @@ jobs:
           - dumi
 
     steps:
-      - checkout:
-          name: Checkout code
-          uses: actions/checkout@v2
-          with:
-            fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Initialize environment variable
         run: echo "CHANGED_PROJECTS=" >> $GITHUB_ENV
@@ -35,10 +34,10 @@ jobs:
 
       - name: Expose Changed Projects to Next Step
         id: expose_changes
-        run: echo "changed_projects=${CHANGED_PROJECTS}" >> $GITHUB_OUTPUT
+        run: echo "changed_projects=$CHANGED_PROJECTS" >> $GITHUB_OUTPUT
 
   collect_all_changes:
-    needs: [check_changes]
+    needs: check_changes
     runs-on: ubuntu-latest
     steps:
       - name: Collect changes
