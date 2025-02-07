@@ -21,35 +21,28 @@ jobs:
       - name: Find modified directories
         id: get-directories
         run: |
-          # 获取修改过的文件列表
           MODIFIED_PATHS=$(git diff --name-only HEAD^ HEAD)
-
-          # 初始化一个数组来保存找到的目录
           DIRECTORIES=()
-
-          # 搜索匹配条件的路径并保存目录名称
           for path in $MODIFIED_PATHS; do
             if [[ $path == */publish.yaml ]]; then
-              # 提取目录名称并添加到数组
               DIRECTORY=$(dirname "$path")
-              # 确保目录唯一
+              # 确保只添加唯一目录
               [[ ! " ${DIRECTORIES[@]} " =~ " ${DIRECTORY} " ]] && DIRECTORIES+=("$DIRECTORY")
             fi
           done
 
-          # 检查是否找到任何目录
+          # 确保输出JSON始终有效
           if [ ${#DIRECTORIES[@]} -eq 0 ]; then
-            echo "No directories found, setting empty JSON array."
             json_dirs="[]"
           else
-            # 将数组转换为 JSON 格式
-            json_dirs=$(printf '%s\n' "${DIRECTORIES[@]}" | jq -R . | jq -s .)
+            # 去除所有空白字符并转换为合法的 JSON
+            json_dirs=$(printf '%s\n' "${DIRECTORIES[@]}" | jq -R . | jq -s . | xargs)
           fi
 
           # 打印输出进行调试
           echo "Found directories JSON: $json_dirs"
 
-          # 导出找到的目录，以便在后续的任务中使用
+          # 将目录字符串导出到环境变量
           echo "directories=$json_dirs" >> $GITHUB_OUTPUT
 
   print-directories:
