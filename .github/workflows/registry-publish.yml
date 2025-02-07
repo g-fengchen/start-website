@@ -6,25 +6,27 @@ on:
     branches:
       - v3
 jobs:
-  scan:
+  detect-changes:
     runs-on: ubuntu-latest
     outputs:
-      projects: ${{ steps.set_outputs.outputs.projects }}
+      dirs: ${{ steps.get-dirs.outputs.dirs }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Find projects
-        id: set_outputs
+      - name: 获取变更的一级目录列表
+        id: get-dirs
         run: |
-          projects=$(find . -maxdepth 1 -mindepth 1 -type d | sed 's|./||') # 获取子目录
-          echo "::set-output name=projects::${projects}" # 设置输出
+          # 提取所有提交中变更的文件路径，并获取一级目录名
+          DIRS=$(git diff --name-only HEAD^ HEAD | cut -d'/' -f1 | sort -u | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          echo "变更目录列表: $DIRS"
+          echo "dirs=$DIRS" >> $GITHUB_OUTPUT
   build:
     runs-on: ubuntu-latest
-    needs: scan
+    needs: detect-changes
     strategy:
       matrix:
-        project: ${{ fromJson(needs.scan.outputs.projects) }} # 使用扫描结果构建矩阵
+        project: ${{ fromJson(needs.detect-changes.outputs.dirs) }} # 使用扫描结果构建矩阵
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
