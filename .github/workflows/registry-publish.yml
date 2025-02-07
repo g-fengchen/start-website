@@ -9,7 +9,7 @@ jobs:
   check_changes:
     runs-on: ubuntu-latest
     outputs:
-      all_changed_projects: ${{ steps.set_output.outputs.changed_projects }}
+      all_changed_projects: ${{ steps.collect_all_changes.outputs.changed_projects }}
     strategy:
       matrix:
         project:
@@ -17,13 +17,13 @@ jobs:
           - dumi
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - checkout:
+          name: Checkout code
+          uses: actions/checkout@v2
+          with:
+            fetch-depth: 0
 
       - name: Initialize environment variable
-        if: ${{ matrix.index == 0 }} # Run only once at the beginning
         run: echo "CHANGED_PROJECTS=" >> $GITHUB_ENV
 
       - name: Check if publish.yaml has changed
@@ -33,24 +33,37 @@ jobs:
             echo "CHANGED_PROJECTS=${{ matrix.project }} $CHANGED_PROJECTS" >> $GITHUB_ENV
           fi
 
-      - name: Set output for all changed projects
-        if: ${{ matrix.index == matrix.project.length - 1 }} # Run only once after all projects have been checked
-        id: set_output
+      - name: Expose Changed Projects to Next Step
+        id: expose_changes
+        run: echo "changed_projects=${CHANGED_PROJECTS}" >> $GITHUB_OUTPUT
+
+  collect_all_changes:
+    needs: [check_changes]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Collect changes
+        id: collect_all_changes
         run: |
-          if [ -z "$CHANGED_PROJECTS" ]; then
-            echo "changed_projects=none" >> $GITHUB_OUTPUT
-          else
-            echo "changed_projects=$(echo $CHANGED_PROJECTS | xargs)" >> $GITHUB_OUTPUT
+          changed_projects_list=""
+          for result in ${{ join(needs.check_changes.*.outputs.changed_projects, ' ') }}; do
+            if [[ "$result" != "none" ]]; then
+              changed_projects_list="${changed_projects_list} $result"
+            fi
+          done
+          changed_projects_list=$(echo $changed_projects_list | xargs)
+          if [[ -z "$changed_projects_list" ]]; then
+            changed_projects_list="none"
           fi
+          echo "changed_projects=${changed_projects_list}" >> $GITHUB_OUTPUT
 
   build:
-    needs: check_changes
+    needs: collect_all_changes
     runs-on: ubuntu-latest
     steps:
       - name: Check if there are any changed projects
         id: output_changed_projects
         run: |
-          changed_projects="${{ needs.check_changes.outputs.all_changed_projects }}"
+          changed_projects="${{ needs.collect_all_changes.outputs.changed_projects }}"
           echo "Changed projects: '${changed_projects}'"
           if [[ "${changed_projects}" == "none" || -z "${changed_projects//[[:space:]]/}" ]]; then
             echo "No changes to build."
@@ -58,4 +71,4 @@ jobs:
           fi
 
       - name: Call Build Workflow
-        run: echo "Calling build workflow for ${{ needs.check_changes.outputs.all_changed_projects }}"
+        run: echo "Calling build workflow for ${{ needs.collect_all_changes.outputs.changed_projects }}"
