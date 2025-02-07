@@ -10,8 +10,6 @@ on:
 jobs:
   find-directories:
     runs-on: ubuntu-latest
-    outputs:
-      directories: ${{ steps.get-directories.outputs.directories }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -19,10 +17,16 @@ jobs:
           fetch-depth: 0
 
       - name: Find modified directories
-        id: get-directories
+        id: find-directories
         run: |
-            # 获取修改过的文件列表
-          MODIFIED_PATHS=$(git diff --name-only HEAD^ HEAD)
+          # 检查是否存在父提交
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            # 获取当前提交和之前提交之间的差异，得到改变的文件列表
+            MODIFIED_PATHS=$(git diff --name-only HEAD^ HEAD)
+          else
+            echo "No parent commit found (initial commit), comparing against empty tree."
+            MODIFIED_PATHS=$(git diff-tree --no-commit-id --name-only -r HEAD)
+          fi
 
           # 初始化一个数组来保存找到的目录
           DIRECTORIES=()
@@ -37,20 +41,8 @@ jobs:
           done
 
           # 将数组转换为字符串，用逗号分隔
-          # DIRECTORIES_STR=$(IFS=,; echo "${DIRECTORIES[*]}")
-          echo "Found directories $DIRECTORIES"
+          DIRECTORIES_STR=$(IFS=,; echo "${DIRECTORIES[*]}")
+          echo "Found directories: $DIRECTORIES"
 
           # 导出找到的目录，以便在后续的任务中使用
           echo "directories=$DIRECTORIES_STR" >> $GITHUB_OUTPUT
-
-  # print-directories:
-  #   runs-on: ubuntu-latest
-  #   needs: find-directories
-  #   strategy:
-  #     matrix:
-  #       dir: ${{ fromJson(needs.find-directories.outputs.directories) }}
-  #   steps:
-  #     - name: Trigger build for each directory
-  #       uses: ./.github/workflows/build-project.yml
-  #       with:
-  #         project: ${{ matrix.dir }}
