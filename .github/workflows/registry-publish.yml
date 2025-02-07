@@ -72,8 +72,7 @@ jobs:
         run: |
           echo "::set-output name=dir::${{ matrix.dir }}"
   trigger-builds:
-    runs-on: ubuntu-latest
-    needs: setup-matrix
     uses: ./.github/workflows/aaaaa.yml
     with:
       project: 1111
+    needs: setup-matrix
