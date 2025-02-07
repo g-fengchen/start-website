@@ -3,7 +3,7 @@ name: Extract Changed Directories
 on:
   push:
     branches:
-      - v3 # 根据需要修改为其他分支
+      - main  # 根据需要修改为其他分支
 
 jobs:
   extract_dirs:
@@ -19,13 +19,19 @@ jobs:
         run: |
           # 获取变更的文件
           if [ "$(git rev-parse --is-inside-work-tree)" ]; then
-            changed_files=$(git diff --name-only HEAD^ HEAD)
-          
+            # 只在有多个提交时使用 HEAD^
+            commit_count=$(git rev-list --count HEAD)
+            if [ "$commit_count" -eq 1 ]; then
+              changed_files=$(git diff --name-only HEAD) # 首次提交，获取所有文件
+            else
+              changed_files=$(git diff --name-only HEAD^ HEAD) # 获取与前一提交的变化
+            fi
+            
             # 提取目录并去重
-            changed_dirs=$(echo "$changed_files" | awk -F/ '{print $1}' | sort -u)
-          
-            # 输出提取的目录到一个环境变量
-            echo "CHANGED_DIRS=$changed_dirs" >> $GITHUB_ENV
+            changed_dirs=$(echo "$changed_files" | awk -F/ '{print $1}' | sort -u | tr '\n' ',' | sed 's/,$//') # 使用逗号分隔
+            
+            # 输出提取的目录到一个环境变量，终止时不允许有额外的逗号
+            echo "CHANGED_DIRS=${changed_dirs}" >> $GITHUB_ENV
           else
             echo "Not inside a Git repository"
           fi
