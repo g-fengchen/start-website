@@ -18,7 +18,7 @@ Service:
       - AliyunFCFullAccess
 Parameters:
   type: object
-  additionalProperties: false # 不允许增加其他属性11
+  additionalProperties: false # 不允许增加其他属性111
   required: # 必填项
     - region
     - functionName
