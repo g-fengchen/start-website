@@ -35,6 +35,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Call Build Workflow
-        if: env.changed_projects != 'none'
+        if: env.changed_projects != 'none' && env.changed_projects != ''
         run: |
           echo "Calling build workflow for ${{ env.changed_projects }}"
