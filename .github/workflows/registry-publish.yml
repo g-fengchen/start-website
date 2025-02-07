@@ -2,8 +2,9 @@ name: CI for Projects
 
 on:
   push:
-    paths:
-      - '*/**
+    # Sequence of patterns matched against refs/heads
+    branches:
+      - v3
 jobs:
   scan:
     runs-on: ubuntu-latest
