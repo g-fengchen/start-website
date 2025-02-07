@@ -33,25 +33,28 @@ jobs:
           # 初始化一个数组来保存找到的目录
           DIRECTORIES=()
 
-          # 搜索匹配条件的路径并保存目录名称
+          # 遍历每个修改过的路径
           for path in $MODIFIED_PATHS; do
             if [[ $path == */publish.yaml ]]; then
-              # 提取目录名称并添加到数组
               DIRECTORY=$(dirname "$path")
-              DIRECTORIES+=("$DIRECTORY")
+              # 确保每个目录唯一
+              [[ ! " ${DIRECTORIES[@]} " =~ " ${DIRECTORY} " ]] && DIRECTORIES+=("$DIRECTORY")
             fi
           done
 
-          # 将数组转换为字符串, 用于输出和调试
-          DIRECTORIES_STR=$(IFS=,; echo "${DIRECTORIES[*]}")
-          echo "Found directories: $DIRECTORIES_STR"
-
-          # 转换为 JSON 数组格式
+          # 如果没有目录，构造空数组
           if [[ ${#DIRECTORIES[@]} -eq 0 ]]; then
             json_array="[]"
           else
-            json_array=$(printf '%s\n' "${DIRECTORIES[@]}" | jq -R . | jq -s .)
+            # 使用 Bash 构造 JSON 数组字符串
+            json_array="["
+            for dir in "${DIRECTORIES[@]}"; do
+              json_array+="\"$dir\","
+            done
+            # 去掉最后一个逗号并关闭数组
+            json_array="${json_array%,}]"
           fi
+          echo "Found JSON array directories: $json_array"
 
           # 导出找到的目录，以便在后续的任务中使用
           echo "directories=$json_array" >> $GITHUB_OUTPUT
