@@ -1,37 +1,29 @@
-name: CI for Projects
+name: Extract Changed Directories
 
 on:
   push:
-    # Sequence of patterns matched against refs/heads
     branches:
-      - v3
+      - main # 根据需要修改为其他分支
+
 jobs:
-  detect-changes:
+  extract_dirs:
     runs-on: ubuntu-latest
-    outputs:
-      dirs: ${{ steps.get-dirs.outputs.dirs }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
-      - name: 获取变更的一级目录列表
-        id: get-dirs
+      - name: Get changed files
+        id: get_changed_files
         run: |
-          # 提取所有提交中变更的文件路径，并获取一级目录名
-          DIRS=$(git diff --name-only HEAD^ HEAD | cut -d'/' -f1 | sort -u | jq -R -s -c 'split("\n") | map(select(. != ""))')
-          echo "变更目录列表: $DIRS"
-          echo "dirs=$DIRS" >> $GITHUB_OUTPUT
-  build:
-    needs: detect-changes
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        dir: ${{ fromJSON(needs.detect-changes.outputs.dirs) }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+          # 获取变更的文件
+          changed_files=$(git diff --name-only HEAD^ HEAD)
+          
+          # 提取目录并去重
+          changed_dirs=$(echo "$changed_files" | awk -F/ '{print $1}' | sort -u)
+          
+          # 输出提取的目录到一个环境变量
+          echo "CHANGED_DIRS=$changed_dirs" >> $GITHUB_ENV
 
-      - name: 构建目录 ${{ matrix.dir }}
+      - name: Use changed directories
         run: |
-          echo "Building ${{ matrix.dir }}..."
-          # 在此添加目录对应的构建逻辑
+          echo "Changed directories are: $CHANGED_DIRS"
