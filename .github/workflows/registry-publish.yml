@@ -72,7 +72,7 @@ jobs:
         run: |
           echo "::set-output name=dir::${{ matrix.dir }}"
   trigger-builds:
+    needs: setup-matrix
     uses: ./.github/workflows/aaaaa.yml
     with:
-      project: 1111
-    needs: setup-matrix
+      project: ${{ needs.setup-matrix.outputs.dir }}
