@@ -14,6 +14,7 @@ jobs:
       matrix:
         project:
           - docusaurus
+          - dumi
 
     steps:
       - name: Checkout code
