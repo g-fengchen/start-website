@@ -9,7 +9,7 @@ jobs:
   check_changes:
     runs-on: ubuntu-latest
     outputs:
-      all_changed_projects: ${{ steps.collect_changes.outputs.changed_projects }}
+      all_changed_projects: ${{ steps.set_output.outputs.changed_projects }}
     strategy:
       matrix:
         project:
@@ -22,27 +22,26 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Initialize changed projects
+      - name: Initialize environment variable
+        if: ${{ matrix.index == 0 }} # Run only once at the beginning
         run: echo "CHANGED_PROJECTS=" >> $GITHUB_ENV
 
       - name: Check if publish.yaml has changed
         id: check_project
         run: |
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q "${{ matrix.project }}/publish.yaml"; then
-            echo "${{ matrix.project }}" >> changed_projects.txt
+            echo "CHANGED_PROJECTS=${{ matrix.project }} $CHANGED_PROJECTS" >> $GITHUB_ENV
           fi
 
-      - name: Append to environment variable
-        if: ${{ success() }}
+      - name: Set output for all changed projects
+        if: ${{ matrix.index == matrix.project.length - 1 }} # Run only once after all projects have been checked
+        id: set_output
         run: |
-          if [ -f changed_projects.txt ]; then
-            PROJECTS=$(cat changed_projects.txt | tr '\n' ' ')
-            echo "CHANGED_PROJECTS=$PROJECTS $CHANGED_PROJECTS" >> $GITHUB_ENV
+          if [ -z "$CHANGED_PROJECTS" ]; then
+            echo "changed_projects=none" >> $GITHUB_OUTPUT
+          else
+            echo "changed_projects=$(echo $CHANGED_PROJECTS | xargs)" >> $GITHUB_OUTPUT
           fi
-
-      - name: Collect changes
-        id: collect_changes
-        run: echo "changed_projects=${{ env.CHANGED_PROJECTS }}" >> $GITHUB_OUTPUT
 
   build:
     needs: check_changes
@@ -52,8 +51,8 @@ jobs:
         id: output_changed_projects
         run: |
           changed_projects="${{ needs.check_changes.outputs.all_changed_projects }}"
-          echo "Changed projects: ${changed_projects}"
-          if [[ -z "${changed_projects// }" || "${changed_projects}" == "" ]]; then
+          echo "Changed projects: '${changed_projects}'"
+          if [[ "${changed_projects}" == "none" || -z "${changed_projects//[[:space:]]/}" ]]; then
             echo "No changes to build."
             exit 0
           fi
