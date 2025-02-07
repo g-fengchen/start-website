@@ -35,6 +35,9 @@ jobs:
     needs: check_changes
     runs-on: ubuntu-latest
     steps:
+      - name: console env
+        run: |
+          echo "ENV ${{ env.changed_projects }}"
       - name: Call Build Workflow
         if: env.changed_projects != 'none' && env.changed_projects != ''
         run: |
