@@ -13,5 +13,6 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3
+
       - name: Print project input
         run: echo "Project input value is ${{ inputs.project }}"
