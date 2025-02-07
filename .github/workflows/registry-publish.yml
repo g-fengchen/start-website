@@ -64,7 +64,6 @@ jobs:
     strategy:
       matrix:
         dir: ${{ fromJson(needs.find-directories.outputs.directories) }}
-    steps:
-      uses: g-fengchen/start-website/.github/workflows/aaaaa.yml@v3
-      with:
-        project: ${{ matrix.dir }}
+    uses: g-fengchen/start-website/.github/workflows/aaaaa.yml@v3
+    with:
+      project: ${{ matrix.dir }}
