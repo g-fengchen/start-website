@@ -1,0 +1,15 @@
+name: Build Project
+
+on:
+  workflow_call:  # 允许其他工作流调用此工作流
+    inputs:
+      project:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print project input
+        run: echo "Project input value is: ${{ inputs.project }}"

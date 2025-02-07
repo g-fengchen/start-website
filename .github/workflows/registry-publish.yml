@@ -46,6 +46,11 @@ jobs:
   print-directories:
     runs-on: ubuntu-latest
     needs: find-directories
+    strategy:
+      matrix:
+        dir: [${{ needs.find-directories.outputs.directories }}]
     steps:
-      - name: Print the modified directories
-        run: echo "The modified directories are ${{ needs.find-directories.outputs.directories }}"
+      - name: Trigger build for each directory
+        uses: ./.github/workflows/build-project.yml
+        with:
+          project: ${{ matrix.dir }}
