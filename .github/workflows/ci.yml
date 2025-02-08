@@ -56,8 +56,8 @@ jobs:
       project: ${{ matrix.dir }}
     secrets:
       TEST: ${{ secrets.TEST }}
-      BAILIAN_APP_ID: 1111
-      BAILIAN_API_KEY: 2222
+      BAILIAN_APP_ID: "1111"
+      BAILIAN_API_KEY: "2222"
     strategy:
       matrix:
         dir: ${{ fromJson(needs.find-directories.outputs.directories) }}
