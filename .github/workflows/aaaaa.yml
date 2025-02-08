@@ -6,6 +6,10 @@ on:
       project:
         required: true
         type: string
+    secrets:
+      TEST:
+        required: true
+        type: string
 
 jobs:
   build:
