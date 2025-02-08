@@ -9,6 +9,14 @@ on:
     secrets:
       TEST:
         required: true
+      BAILIAN_APP_ID:
+        required: true
+      BAILIAN_API_KEY:
+        required: true
+env:
+  BAILIAN_APP_ID: ${{ secrets.BAILIAN_APP_ID }}
+  BAILIAN_API_KEY: ${{ secrets.BAILIAN_API_KEY }}
+  SEMVER_TYPE: patch
 
 jobs:
   build:
@@ -19,6 +27,12 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3
+
+      - name: Display Environment Variables
+        run: |
+          echo "App ID: $BAILIAN_APP_ID"
+          echo "API Key: $BAILIAN_API_KEY"
+          echo "Semver Type: $SEMVER_TYPE"
 
       - name: Print project input
         run: |

@@ -21,50 +21,43 @@ jobs:
       - name: Find modified directories
         id: set-dirs
         run: |
-          # 检查是否存在父提交
           if git rev-parse HEAD^ >/dev/null 2>&1; then
-            # 获取当前提交和之前提交之间的差异，得到改变的文件列表
             MODIFIED_PATHS=$(git diff --name-only HEAD^ HEAD)
           else
             echo "No parent commit found (initial commit), comparing against empty tree."
             MODIFIED_PATHS=$(git diff-tree --no-commit-id --name-only -r HEAD)
           fi
 
-          # 初始化一个数组来保存找到的目录
           DIRECTORIES=()
 
-          # 遍历每个修改过的路径
           for path in $MODIFIED_PATHS; do
             if [[ $path == */publish.yaml ]]; then
               DIRECTORY=$(dirname "$path")
-              # 确保每个目录唯一
               [[ ! " ${DIRECTORIES[@]} " =~ " ${DIRECTORY} " ]] && DIRECTORIES+=("$DIRECTORY")
             fi
           done
 
-          # 如果没有目录，构造空数组
           if [[ ${#DIRECTORIES[@]} -eq 0 ]]; then
             json_array="[]"
           else
-            # 使用 Bash 构造 JSON 数组字符串
             json_array="["
             for dir in "${DIRECTORIES[@]}"; do
               json_array+="\"$dir\","
             done
-            # 去掉最后一个逗号并关闭数组
             json_array="${json_array%,}]"
           fi
-          echo "Found JSON array directories: $json_array"
 
-          # 导出找到的目录，以便在后续的任务中使用
           echo "directories=$json_array" >> $GITHUB_OUTPUT
-  trigger-builds:
+
+  trigger-publish:
     needs: find-directories
-    uses: ./.github/workflows/aaaaa.yml
+    uses: ./.github/workflows/beta-registry-publish.yml
     with:
       project: ${{ matrix.dir }}
     secrets:
       TEST: ${{ secrets.TEST }}
+      BAILIAN_APP_ID: 1111
+      BAILIAN_API_KEY: 2222
     strategy:
       matrix:
         dir: ${{ fromJson(needs.find-directories.outputs.directories) }}
