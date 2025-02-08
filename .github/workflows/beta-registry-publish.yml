@@ -1,13 +1,13 @@
-name: Build Project
+name: Registry Publish
 
 on:
-  workflow_call: # 允许其他工作流调用此工作流
+  workflow_call:
     inputs:
       project:
         required: true
         type: string
     secrets:
-      TEST:
+      ALIBABA_REGISTRY_V3_PUBLISH_TOKEN:
         required: true
       BAILIAN_APP_ID:
         required: true
@@ -19,29 +19,35 @@ env:
   SEMVER_TYPE: patch
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: "${{ inputs.project }}"
     steps:
-      - name: Check out code
-        uses: actions/checkout@v3
-
-      - name: Display Environment Variables
+      - run: git config --global core.symlinks false
+        shell: bash
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+      - name: Install dependencies
         run: |
-          echo "App ID: $BAILIAN_APP_ID"
-          echo "API Key: $BAILIAN_API_KEY"
-          echo "Semver Type: $SEMVER_TYPE"
-
-      - name: Print project input
+          sudo apt-get update
+          sudo apt-get install -y git make jq curl wget
+      - name: generate README
         run: |
-          echo "当前位置：$(pwd)"
+          npx msa-tool generate
+      - name: List files
+        run: |
           ls -la
-          echo "Project input value is ${{ inputs.project }}"
-
-      - name: console secrets
+      - name: generate publish.yaml
         run: |
-          echo "当前位置：$(pwd)"
-          ls -la
-          echo "Project secrets test is ${{ secrets.TEST }}"
+          npx msa-tool publish
+      - name: install s
+        run: |
+          npm i @serverless-devs/s@3.1.3 -g
+      - name: s registry login
+        run: |
+          s registry login --token ${{ secrets.ALIBABA_REGISTRY_V3_PUBLISH_TOKEN }}
+      - name: release prod
+        run: |
+          s registry publish
