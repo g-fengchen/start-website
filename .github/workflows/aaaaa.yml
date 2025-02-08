@@ -13,12 +13,21 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "${{ inputs.project }}"
     steps:
       - name: Check out code
         uses: actions/checkout@v3
 
       - name: Print project input
-        run: echo "Project input value is ${{ inputs.project }}"
+        run: |
+          echo "当前位置：$(pwd)"
+          ls -la
+          echo "Project input value is ${{ inputs.project }}"
 
       - name: console secrets
-        run: echo "Project secrets test is ${{ secrets.TEST }}"
+        run: |
+          echo "当前位置：$(pwd)"
+          ls -la
+          echo "Project secrets test is ${{ secrets.TEST }}"
