@@ -16,3 +16,6 @@ jobs:
 
       - name: Print project input
         run: echo "Project input value is ${{ inputs.project }}"
+
+      - name: console secrets
+        run: echo "Project secrets test is ${{ secrets.TEST }}"
