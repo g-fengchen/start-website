@@ -1,10 +1,10 @@
-
 > 注：当前项目为 Serverless Devs 应用，由于应用中会存在需要初始化才可运行的变量（例如应用部署地区、函数名等等），所以**不推荐**直接 Clone 本仓库到本地进行部署或直接复制 s.yaml 使用，**强烈推荐**通过 `s init ${模版名称}` 的方法或应用中心进行初始化，详情可参考[部署 & 体验](#部署--体验) 。
 
 # website-dumi-v3 帮助文档
+
 <p align="center" class="flex justify-center">
     <a href="https://www.serverless-devs.com" class="ml-1">
-    <img src="http://editor.devsapp.cn/icon?package=website-dumi-v3&type=packageType">
+    <img src="http://editor.devsapp.cn/icon?packa333ge=website-dumi-v3&type=packageType">
   </a>
   <a href="http://www.devsapp.cn/details.html?name=website-dumi-v3" class="ml-1">
     <img src="http://editor.devsapp.cn/icon?package=website-dumi-v3&type=packageVersion">
@@ -22,15 +22,10 @@ Serverless Devs 应用开发模板
 
 <codeUrl>
 
-
-
 </codeUrl>
 <preview>
 
-
-
 </preview>
-
 
 ## 前期准备
 
@@ -38,23 +33,17 @@ Serverless Devs 应用开发模板
 
 <service>
 
-
-
-| 服务/业务 |  权限  | 相关文档 |
-| --- |  --- | --- |
-| 函数计算 |  AliyunFCFullAccess | [帮助文档](https://help.aliyun.com/product/2508973.html) [计费文档](https://help.aliyun.com/document_detail/2512928.html) |
+| 服务/业务 | 权限               | 相关文档                                                                                                                  |
+| --------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| 函数计算  | AliyunFCFullAccess | [帮助文档](https://help.aliyun.com/product/2508973.html) [计费文档](https://help.aliyun.com/document_detail/2512928.html) |
 
 </service>
 
 <remark>
 
-
-
 </remark>
 
 <disclaimers>
-
-
 
 </disclaimers>
 
@@ -89,8 +78,6 @@ Dumi 的灵活性表现在它支持多种文档格式，包括 Markdown 和 JSX�
 
 Dumi 也支持静态站点的生成，这意味着开发者可以将文档部署到 Serverless 开发平台，从而实现快速、便捷的文档发布和更新。
 
-
-
 </appdetail>
 
 ## 使用流程
@@ -98,6 +85,7 @@ Dumi 也支持静态站点的生成，这意味着开发者可以将文档部署
 <usedetail id="flushContent">
 
 ### 查看部署的应用
+
 本项目案例是 dumi 部署到阿里云 Serverless 平台（函数计算 FC），部署完成之后，您可以看到系统返回给您的案例地址，例如：
 
 ![图片alt](https://img.alicdn.com/imgextra/i3/O1CN01Jy0N4Z21BmOGYjobX_!!6000000006947-0-tps-1382-766.jpg)
@@ -107,6 +95,7 @@ Dumi 也支持静态站点的生成，这意味着开发者可以将文档部署
 ![图片alt](https://img.alicdn.com/imgextra/i3/O1CN01TxWTvM1cUDwi4CjKn_!!6000000003603-0-tps-2730-1306.jpg)
 
 ### 二次开发
+
 您可以通过页面上的云端开发功能，在线进行二次开发。如您之前是在本地创建项目，也可以在本地的项目目录`website-dumi-v3`下，对项目进行二次开发。在完成开发后，您可以通过`s deploy`命令重新部署该项目并进行查看。
 
 </usedetail>
@@ -116,18 +105,17 @@ Dumi 也支持静态站点的生成，这意味着开发者可以将文档部署
 <matters id="flushContent">
 </matters>
 
-
 <devgroup>
-
 
 ## 开发者社区
 
 您如果有关于错误的反馈或者未来的期待，您可以在 [Serverless Devs repo Issues](https://github.com/serverless-devs/serverless-devs/issues) 中进行反馈和交流。如果您想要加入我们的讨论组或者了解 FC 组件的最新动态，您可以通过以下渠道进行：
 
-<p align="center">  
+<p align="center">
 
 | <img src="https://serverless-article-picture.oss-cn-hangzhou.aliyuncs.com/1635407298906_20211028074819117230.png" width="130px" > | <img src="https://serverless-article-picture.oss-cn-hangzhou.aliyuncs.com/1635407044136_20211028074404326599.png" width="130px" > | <img src="https://serverless-article-picture.oss-cn-hangzhou.aliyuncs.com/1635407252200_20211028074732517533.png" width="130px" > |
 | --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | <center>微信公众号：`serverless`</center>                                                                                         | <center>微信小助手：`xiaojiangwh`</center>                                                                                        | <center>钉钉交流群：`33947367`</center>                                                                                           |
+
 </p>
 </devgroup>

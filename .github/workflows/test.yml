@@ -29,6 +29,12 @@ jobs:
           DIRECTORIES=()
 
           for path in $MODIFIED_PATHS; do
+
+            if [[ "$path" == .github/* ]]; then
+              echo "Ignoring .github path: $path"
+              continue
+            fi
+
             ROOT_DIR=$(echo "$path" | cut -d'/' -f1)
             if [[ ! " ${DIRECTORIES[@]} " =~ " ${ROOT_DIR} " ]]; then
               DIRECTORIES+=("$ROOT_DIR")
