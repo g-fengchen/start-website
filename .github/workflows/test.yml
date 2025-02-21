@@ -29,8 +29,10 @@ jobs:
           DIRECTORIES=()
 
           for path in $MODIFIED_PATHS; do
-            DIRECTORY=$(dirname "$path")
-            [[ ! " ${DIRECTORIES[@]} " =~ " ${DIRECTORY} " ]] && DIRECTORIES+=("$DIRECTORY")
+            ROOT_DIR=$(echo "$path" | cut -d'/' -f1)
+            if [[ ! " ${DIRECTORIES[@]} " =~ " ${ROOT_DIR} " ]]; then
+              DIRECTORIES+=("$ROOT_DIR")
+            fi
           done
 
           if [[ ${#DIRECTORIES[@]} -eq 0 ]]; then
