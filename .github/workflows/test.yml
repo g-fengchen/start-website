@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  find-directories:
+    runs-on: ubuntu-latest
+    outputs:
+      directories: ${{ steps.set-dirs.outputs.directories }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Find modified directories
+        id: set-dirs
+        run: |
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            MODIFIED_PATHS=$(git diff --name-only HEAD^ HEAD)
+          else
+            echo "No parent commit found (initial commit), comparing against empty tree."
+            MODIFIED_PATHS=$(git diff-tree --no-commit-id --name-only -r HEAD)
+          fi
+
+          DIRECTORIES=()
+
+          for path in $MODIFIED_PATHS; do
+            if [[ $path == */description.yml ]]; then
+              DIRECTORY=$(dirname "$path")
+              [[ ! " ${DIRECTORIES[@]} " =~ " ${DIRECTORY} " ]] && DIRECTORIES+=("$DIRECTORY")
+            fi
+          done
+
+          if [[ ${#DIRECTORIES[@]} -eq 0 ]]; then
+            json_array="[]"
+          else
+            json_array="["
+            for dir in "${DIRECTORIES[@]}"; do
+              json_array+="\"$dir\","
+            done
+            json_array="${json_array%,}]"
+          fi
+          echo "json_array：$(json_array)"
+          echo "directories=$json_array" >> $GITHUB_OUTPUT
+
