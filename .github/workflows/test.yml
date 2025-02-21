@@ -19,30 +19,31 @@ jobs:
       - name: Find modified directories
         id: set-dirs
         run: |
+          # 获取修改文件列表（兼容首次提交）
           if git rev-parse HEAD^ >/dev/null 2>&1; then
-            MODIFIED_PATHS=$(git diff --name-only HEAD^ HEAD)
+            MODIFIED_FILES=$(git diff --name-only HEAD^ HEAD)
           else
-            echo "No parent commit found (initial commit), comparing against empty tree."
-            MODIFIED_PATHS=$(git diff-tree --no-commit-id --name-only -r HEAD)
+            MODIFIED_FILES=$(git diff-tree --no-commit-id --name-only -r HEAD)
           fi
 
+          # 提取所有一级子目录并去重
           DIRECTORIES=()
-
-          for path in $MODIFIED_PATHS; do
-            if [[ $path == */description.yml ]]; then
-              DIRECTORY=$(dirname "$path")
-              [[ ! " ${DIRECTORIES[@]} " =~ " ${DIRECTORY} " ]] && DIRECTORIES+=("$DIRECTORY")
+          while IFS= read -r file; do
+            if [[ -n "$file" ]]; then
+              # 获取文件所在目录，并提取根目录下的一级子目录
+              dir=$(dirname "$file")
+              root_subdir=$(echo "$dir" | cut -d'/' -f1)
+              if [[ -n "$root_subdir" && "$dir" != "$root_subdir" ]]; then
+                [[ ! " ${DIRECTORIES[@]} " =~ " $root_subdir " ]] && DIRECTORIES+=("$root_subdir")
+              fi
             fi
-          done
+          done <<< "$MODIFIED_FILES"
 
+          # 生成 JSON 输出
           if [[ ${#DIRECTORIES[@]} -eq 0 ]]; then
             json_array="[]"
           else
-            json_array="["
-            for dir in "${DIRECTORIES[@]}"; do
-              json_array+="\"$dir\","
-            done
-            json_array="${json_array%,}]"
+            json_array=$(jq -cn '$ARGS.positional' --args -- "${DIRECTORIES[@]}")
           fi
           echo "json_array：$(json_array)"
           echo "directories=$json_array" >> $GITHUB_OUTPUT
